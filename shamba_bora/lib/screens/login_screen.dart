@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
-
+import '../services/auth_service.dart';
 import '../widgets/custom_text_field.dart';
 
 class LoginScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
 
-  void _login(BuildContext context) {
+  void _login(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      // Perform login
-      Navigator.pushNamed(context, '/home');
+      String? token = await _authService.login(
+        _phoneController.text,
+        _passwordController.text,
+      );
+
+      if (token != null) {
+        // Save the token and navigate to the home screen
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Login failed. Please check your credentials.')),
+        );
+      }
     }
   }
 
